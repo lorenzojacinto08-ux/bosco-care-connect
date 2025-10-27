@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Shield } from "lucide-react";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -77,11 +78,18 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">BoscoCare</CardTitle>
-          <CardDescription>Pastoral and Guidance System</CardDescription>
+          <div className="flex flex-col items-center gap-3 mb-4">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-guidance to-pastoral flex items-center justify-center">
+              <Shield className="h-9 w-9 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Boscocare</h1>
+              <p className="text-sm text-muted-foreground">Pastoral & Guidance System</p>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login">
