@@ -6,7 +6,7 @@ import { Shield, Users2, Users, LogOut } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, role, signOut } = useAuth();
+  const { user, role, loading, signOut } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -16,6 +16,18 @@ const Index = () => {
   if (!user) {
     navigate("/auth");
     return null;
+  }
+
+  // Wait for role to be fetched
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-guidance mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   const cards = [
