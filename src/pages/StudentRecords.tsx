@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,14 @@ import { ArrowLeft, Plus } from "lucide-react";
 
 export default function StudentRecords() {
   const navigate = useNavigate();
+  const { role } = useAuth();
   const { toast } = useToast();
+
+  // Redirect if not admin
+  if (role !== "admin") {
+    navigate("/");
+    return null;
+  }
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -214,8 +222,8 @@ export default function StudentRecords() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen bg-muted/30">
+      <header className="border-b bg-background">
         <div className="container flex h-16 items-center justify-between px-4">
           <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -226,7 +234,7 @@ export default function StudentRecords() {
             if (!isOpen) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="bg-guidance hover:bg-guidance/90">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Student
               </Button>
@@ -389,9 +397,25 @@ export default function StudentRecords() {
                     />
                   </div>
                 </div>
-                <Button type="submit" className="w-full">
-                  {editingStudent ? "Update" : "Add"} Student
-                </Button>
+                <div className="flex gap-3">
+                  <Button 
+                    type="submit" 
+                    className="flex-1 bg-guidance hover:bg-guidance/90"
+                  >
+                    {editingStudent ? "Update" : "Create"}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                      setOpen(false);
+                      resetForm();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </form>
             </DialogContent>
           </Dialog>
