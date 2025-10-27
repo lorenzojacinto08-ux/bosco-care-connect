@@ -38,6 +38,10 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    --guidance: 186 80% 50%;
+    --pastoral: 36 100% 60%;
+    --student: 186 60% 80%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;

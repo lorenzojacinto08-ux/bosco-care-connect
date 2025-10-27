@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Heart, Users, LogOut } from "lucide-react";
+import { Shield, Users2, Users, LogOut } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -21,49 +21,55 @@ const Index = () => {
   const cards = [
     {
       title: "Guidance",
-      description: "Schedule appointments and view guidance history",
-      icon: BookOpen,
+      description: "View and schedule guidance activities",
+      icon: Shield,
       path: "/guidance",
-      iconColor: "text-blue-500"
+      color: "guidance",
+      buttonText: "Access Guidance"
     },
     {
       title: "Pastoral",
-      description: "View events and sacramental scriptures",
-      icon: Heart,
+      description: "View pastoral activities and sacraments",
+      icon: Users2,
       path: "/pastoral",
-      iconColor: "text-rose-500"
+      color: "pastoral",
+      buttonText: "Access Pastoral"
     },
     {
       title: "Student Records",
-      description: "Manage student information and records",
+      description: "View student information",
       icon: Users,
       path: "/student-records",
       adminOnly: true,
-      iconColor: "text-green-500"
+      color: "student",
+      buttonText: "Access Student Records"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen bg-muted/30">
+      <header className="border-b bg-background">
         <div className="container flex h-16 items-center justify-between px-4">
-          <h1 className="text-2xl font-bold">BoscoCare</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {role === "admin" ? "Admin" : "Student"}
-            </span>
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-guidance to-pastoral flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Boscocare</h1>
+              <p className="text-xs text-muted-foreground">Pastoral & Guidance System</p>
+            </div>
           </div>
+          <Button variant="outline" size="sm" onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign Out
+          </Button>
         </div>
       </header>
 
-      <main className="container px-4 py-8">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold mb-2">Welcome to BoscoCare</h2>
-          <p className="text-muted-foreground">Select a section to get started</p>
+      <main className="container px-4 py-16">
+        <div className="mb-12 text-center">
+          <h2 className="text-4xl font-bold mb-3">Welcome to Boscocare</h2>
+          <p className="text-muted-foreground">Select your section to continue</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
@@ -74,19 +80,23 @@ const Index = () => {
             return (
               <Card
                 key={card.path}
-                className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+                className="cursor-pointer transition-all hover:shadow-lg relative overflow-hidden border-t-4"
+                style={{ borderTopColor: `hsl(var(--${card.color}))` }}
                 onClick={() => navigate(card.path)}
               >
-                <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 ${card.iconColor}`}>
-                    <Icon className="h-6 w-6" />
+                <CardHeader className="pb-4">
+                  <div 
+                    className="w-14 h-14 rounded-xl flex items-center justify-center mb-4"
+                    style={{ backgroundColor: `hsl(var(--${card.color}))` }}
+                  >
+                    <Icon className="h-7 w-7 text-white" />
                   </div>
-                  <CardTitle>{card.title}</CardTitle>
-                  <CardDescription>{card.description}</CardDescription>
+                  <CardTitle className="text-xl">{card.title}</CardTitle>
+                  <CardDescription className="text-muted-foreground">{card.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Button variant="secondary" className="w-full">
-                    Open
+                <CardContent className="pt-0">
+                  <Button variant="outline" className="w-full">
+                    {card.buttonText}
                   </Button>
                 </CardContent>
               </Card>
