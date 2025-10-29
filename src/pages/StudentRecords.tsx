@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Shield } from "lucide-react";
 
 export default function StudentRecords() {
   const navigate = useNavigate();
@@ -225,20 +225,30 @@ export default function StudentRecords() {
     <div className="min-h-screen bg-muted/30">
       <header className="border-b bg-background">
         <div className="container flex h-16 items-center justify-between px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
-          <Dialog open={open} onOpenChange={(isOpen) => {
-            setOpen(isOpen);
-            if (!isOpen) resetForm();
-          }}>
-            <DialogTrigger asChild>
-              <Button className="bg-guidance hover:bg-guidance/90">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Student
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-guidance to-pastoral flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Student Records</h1>
+              <p className="text-xs text-muted-foreground">Manage Student Information</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate("/")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+            <Dialog open={open} onOpenChange={(isOpen) => {
+              setOpen(isOpen);
+              if (!isOpen) resetForm();
+            }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Student
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{editingStudent ? "Edit" : "Add"} Student Record</DialogTitle>
@@ -417,15 +427,16 @@ export default function StudentRecords() {
                   </Button>
                 </div>
               </form>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </header>
 
-      <main className="container px-4 py-8">
-        <Card>
+      <main className="container px-4 py-16">
+        <Card className="border-t-4" style={{ borderTopColor: "hsl(var(--student))" }}>
           <CardHeader>
-            <CardTitle>Student Records</CardTitle>
+            <CardTitle className="text-2xl">Student Records</CardTitle>
             <CardDescription>Manage student information by education level</CardDescription>
           </CardHeader>
           <CardContent>

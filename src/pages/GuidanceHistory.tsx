@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Shield } from "lucide-react";
 
 export default function GuidanceHistory() {
   const navigate = useNavigate();
@@ -75,20 +75,29 @@ export default function GuidanceHistory() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/guidance")}>
+    <div className="min-h-screen bg-muted/30">
+      <header className="border-b bg-background">
+        <div className="container flex h-16 items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-guidance to-pastoral flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Guidance History</h1>
+              <p className="text-xs text-muted-foreground">Manage Appointments</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => navigate("/guidance")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
         </div>
       </header>
 
-      <main className="container px-4 py-8">
-        <Card>
+      <main className="container px-4 py-16">
+        <Card className="border-t-4" style={{ borderTopColor: "hsl(var(--guidance))" }}>
           <CardHeader>
-            <CardTitle>Guidance History</CardTitle>
+            <CardTitle className="text-2xl">Guidance History</CardTitle>
             <CardDescription>View and manage all guidance appointments</CardDescription>
           </CardHeader>
           <CardContent>

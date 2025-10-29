@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Shield } from "lucide-react";
 
 export default function PastoralEvents() {
   const navigate = useNavigate();
@@ -119,24 +119,34 @@ export default function PastoralEvents() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen bg-muted/30">
+      <header className="border-b bg-background">
         <div className="container flex h-16 items-center justify-between px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/pastoral")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-          {role === "admin" && (
-            <Dialog open={open} onOpenChange={(isOpen) => {
-              setOpen(isOpen);
-              if (!isOpen) resetForm();
-            }}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Event
-                </Button>
-              </DialogTrigger>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-guidance to-pastoral flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Pastoral Events</h1>
+              <p className="text-xs text-muted-foreground">Manage Events</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate("/pastoral")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+            {role === "admin" && (
+              <Dialog open={open} onOpenChange={(isOpen) => {
+                setOpen(isOpen);
+                if (!isOpen) resetForm();
+              }}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Event
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{editingEvent ? "Edit" : "Add"} Pastoral Event</DialogTitle>
@@ -185,16 +195,17 @@ export default function PastoralEvents() {
                     {editingEvent ? "Update" : "Create"} Event
                   </Button>
                 </form>
-              </DialogContent>
-            </Dialog>
-          )}
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
       </header>
 
-      <main className="container px-4 py-8">
-        <Card>
+      <main className="container px-4 py-16">
+        <Card className="border-t-4" style={{ borderTopColor: "hsl(var(--pastoral))" }}>
           <CardHeader>
-            <CardTitle>Pastoral Events</CardTitle>
+            <CardTitle className="text-2xl">Pastoral Events</CardTitle>
             <CardDescription>Upcoming and past pastoral events</CardDescription>
           </CardHeader>
           <CardContent>

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Shield } from "lucide-react";
 
 export default function SacramentalScriptures() {
   const navigate = useNavigate();
@@ -114,24 +114,34 @@ export default function SacramentalScriptures() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen bg-muted/30">
+      <header className="border-b bg-background">
         <div className="container flex h-16 items-center justify-between px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/pastoral")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-          {role === "admin" && (
-            <Dialog open={open} onOpenChange={(isOpen) => {
-              setOpen(isOpen);
-              if (!isOpen) resetForm();
-            }}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Scripture
-                </Button>
-              </DialogTrigger>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-guidance to-pastoral flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Sacramental Scriptures</h1>
+              <p className="text-xs text-muted-foreground">Spiritual Resources</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate("/pastoral")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+            {role === "admin" && (
+              <Dialog open={open} onOpenChange={(isOpen) => {
+                setOpen(isOpen);
+                if (!isOpen) resetForm();
+              }}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Scripture
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{editingScripture ? "Edit" : "Add"} Sacramental Scripture</DialogTitle>
@@ -172,15 +182,16 @@ export default function SacramentalScriptures() {
                     {editingScripture ? "Update" : "Create"} Scripture
                   </Button>
                 </form>
-              </DialogContent>
-            </Dialog>
-          )}
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
       </header>
 
-      <main className="container px-4 py-8">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold mb-2">Sacramental Scriptures</h2>
+      <main className="container px-4 py-16">
+        <div className="mb-12 text-center">
+          <h2 className="text-4xl font-bold mb-3">Sacramental Scriptures</h2>
           <p className="text-muted-foreground">Spiritual texts and readings</p>
         </div>
 
@@ -191,9 +202,9 @@ export default function SacramentalScriptures() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {scriptures.map((scripture) => (
-              <Card key={scripture.id}>
+              <Card key={scripture.id} className="border-t-4" style={{ borderTopColor: "hsl(var(--pastoral))" }}>
                 <CardHeader>
-                  <CardTitle>{scripture.title}</CardTitle>
+                  <CardTitle className="text-xl">{scripture.title}</CardTitle>
                   {scripture.sacrament_type && (
                     <CardDescription>{scripture.sacrament_type}</CardDescription>
                   )}
