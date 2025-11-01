@@ -9,8 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Shield } from "lucide-react";
+import { ArrowLeft, Plus, Shield, CalendarIcon, Clock } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function PastoralEvents() {
   const navigate = useNavigate();
@@ -24,7 +28,8 @@ export default function PastoralEvents() {
   // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [eventDate, setEventDate] = useState("");
+  const [eventDate, setEventDate] = useState<Date>();
+  const [eventTime, setEventTime] = useState("09:00");
   const [location, setLocation] = useState("");
 
   useEffect(() => {
@@ -46,12 +51,17 @@ export default function PastoralEvents() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !eventDate) return;
+
+    // Combine date and time
+    const [hours, minutes] = eventTime.split(':');
+    const combinedDateTime = new Date(eventDate);
+    combinedDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
     const eventData = {
       title,
       description,
-      event_date: eventDate,
+      event_date: combinedDateTime.toISOString(),
       location,
       created_by: user.id
     };
@@ -105,7 +115,9 @@ export default function PastoralEvents() {
     setEditingEvent(event);
     setTitle(event.title);
     setDescription(event.description || "");
-    setEventDate(event.event_date);
+    const date = new Date(event.event_date);
+    setEventDate(date);
+    setEventTime(format(date, "HH:mm"));
     setLocation(event.location || "");
     setOpen(true);
   };
@@ -114,7 +126,8 @@ export default function PastoralEvents() {
     setEditingEvent(null);
     setTitle("");
     setDescription("");
-    setEventDate("");
+    setEventDate(undefined);
+    setEventTime("09:00");
     setLocation("");
   };
 
@@ -173,15 +186,47 @@ export default function PastoralEvents() {
                       rows={3}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="date">Event Date & Time</Label>
-                    <Input
-                      id="date"
-                      type="datetime-local"
-                      value={eventDate}
-                      onChange={(e) => setEventDate(e.target.value)}
-                      required
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Event Date *</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !eventDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {eventDate ? format(eventDate, "PPP") : "Pick a date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={eventDate}
+                            onSelect={setEventDate}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="time">Event Time *</Label>
+                      <div className="relative">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="time"
+                          type="time"
+                          value={eventTime}
+                          onChange={(e) => setEventTime(e.target.value)}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="location">Location</Label>

@@ -10,8 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Shield } from "lucide-react";
+import { ArrowLeft, Plus, Shield, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function StudentRecords() {
   const navigate = useNavigate();
@@ -32,7 +36,7 @@ export default function StudentRecords() {
   const [studentId, setStudentId] = useState("");
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date>();
   const [gradeYearLevel, setGradeYearLevel] = useState("");
   const [sectionProgram, setSectionProgram] = useState("");
   const [address, setAddress] = useState("");
@@ -70,7 +74,7 @@ export default function StudentRecords() {
       student_id: studentId,
       full_name: fullName,
       gender,
-      date_of_birth: dateOfBirth || null,
+      date_of_birth: dateOfBirth ? format(dateOfBirth, "yyyy-MM-dd") : null,
       grade_year_level: gradeYearLevel,
       section_program: sectionProgram,
       address,
@@ -135,7 +139,7 @@ export default function StudentRecords() {
     setStudentId(student.student_id);
     setFullName(student.full_name);
     setGender(student.gender || "");
-    setDateOfBirth(student.date_of_birth || "");
+    setDateOfBirth(student.date_of_birth ? new Date(student.date_of_birth) : undefined);
     setGradeYearLevel(student.grade_year_level);
     setSectionProgram(student.section_program || "");
     setAddress(student.address || "");
@@ -156,7 +160,7 @@ export default function StudentRecords() {
     setStudentId("");
     setFullName("");
     setGender("");
-    setDateOfBirth("");
+    setDateOfBirth(undefined);
     setGradeYearLevel("");
     setSectionProgram("");
     setAddress("");
@@ -289,13 +293,30 @@ export default function StudentRecords() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="dob">Date of Birth</Label>
-                    <Input
-                      id="dob"
-                      type="date"
-                      value={dateOfBirth}
-                      onChange={(e) => setDateOfBirth(e.target.value)}
-                    />
+                    <Label>Date of Birth</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !dateOfBirth && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {dateOfBirth ? format(dateOfBirth, "PPP") : "Pick a date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={dateOfBirth}
+                          onSelect={setDateOfBirth}
+                          disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="gradeLevel">Grade / Year Level *</Label>

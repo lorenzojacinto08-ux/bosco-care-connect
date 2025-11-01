@@ -8,8 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Shield } from "lucide-react";
+import { ArrowLeft, Shield, CalendarIcon, Clock } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function GuidanceScheduling() {
   const navigate = useNavigate();
@@ -25,7 +29,8 @@ export default function GuidanceScheduling() {
   const [yearLevel, setYearLevel] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [concernType, setConcernType] = useState("");
-  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledDate, setScheduledDate] = useState<Date>();
+  const [scheduledTime, setScheduledTime] = useState("09:00");
   const [reason, setReason] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
 
@@ -69,9 +74,14 @@ export default function GuidanceScheduling() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !scheduledDate) return;
 
     setLoading(true);
+
+    // Combine date and time
+    const [hours, minutes] = scheduledTime.split(':');
+    const combinedDateTime = new Date(scheduledDate);
+    combinedDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
     // Compile detailed notes
     const detailedNotes = `
@@ -89,7 +99,7 @@ ${additionalInfo}
 
     const { error } = await supabase.from("guidance_schedules").insert({
       student_id: user.id,
-      scheduled_date: scheduledDate,
+      scheduled_date: combinedDateTime.toISOString(),
       reason: reason,
       notes: detailedNotes,
       status: "pending"
@@ -111,7 +121,8 @@ ${additionalInfo}
       setYearLevel("");
       setContactNumber("");
       setConcernType("");
-      setScheduledDate("");
+      setScheduledDate(undefined);
+      setScheduledTime("09:00");
       setReason("");
       setAdditionalInfo("");
     }
@@ -211,15 +222,48 @@ ${additionalInfo}
                     </Select>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="date">Preferred Date & Time *</Label>
-                    <Input
-                      id="date"
-                      type="datetime-local"
-                      value={scheduledDate}
-                      onChange={(e) => setScheduledDate(e.target.value)}
-                      required
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Preferred Date *</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !scheduledDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {scheduledDate ? format(scheduledDate, "PPP") : "Pick a date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={scheduledDate}
+                            onSelect={setScheduledDate}
+                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="time">Preferred Time *</Label>
+                      <div className="relative">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="time"
+                          type="time"
+                          value={scheduledTime}
+                          onChange={(e) => setScheduledTime(e.target.value)}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="space-y-2">
