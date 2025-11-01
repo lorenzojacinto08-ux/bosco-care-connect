@@ -29,25 +29,42 @@ export default function GuidanceScheduling() {
   const [reason, setReason] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
 
-  // Fetch user profile on mount
+  // Fetch student record on mount
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchStudentRecord = async () => {
       if (!user) return;
       
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("full_name, email")
-        .eq("id", user.id)
+      // First try to get student record by email
+      const { data: studentRecord } = await supabase
+        .from("student_records")
+        .select("*")
+        .eq("email_address", user.email)
         .maybeSingle();
       
-      if (data) {
-        setFullName(data.full_name || "");
-        setEmail(data.email || "");
+      if (studentRecord) {
+        // Pre-fill all fields from student record
+        setFullName(studentRecord.full_name || "");
+        setEmail(studentRecord.email_address || "");
+        setStudentId(studentRecord.student_id || "");
+        setYearLevel(studentRecord.grade_year_level || "");
+        setContactNumber(studentRecord.phone_number || "");
+      } else {
+        // Fallback to profile if no student record
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, email")
+          .eq("id", user.id)
+          .maybeSingle();
+        
+        if (profile) {
+          setFullName(profile.full_name || "");
+          setEmail(profile.email || "");
+        }
       }
       setProfileLoading(false);
     };
     
-    fetchProfile();
+    fetchStudentRecord();
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -133,69 +150,44 @@ ${additionalInfo}
               <div className="text-center py-8">Loading profile...</div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Student Information Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground border-b pb-2">Student Information</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">Full Name *</Label>
-                      <Input
-                        id="fullName"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Enter your full name"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="your.email@example.com"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="studentId">Student ID *</Label>
-                      <Input
-                        id="studentId"
-                        value={studentId}
-                        onChange={(e) => setStudentId(e.target.value)}
-                        placeholder="e.g., 2024-00123"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="yearLevel">Year Level / Grade *</Label>
-                      <Input
-                        id="yearLevel"
-                        value={yearLevel}
-                        onChange={(e) => setYearLevel(e.target.value)}
-                        placeholder="e.g., Grade 11, 3rd Year"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="contactNumber">Contact Number *</Label>
-                      <Input
-                        id="contactNumber"
-                        type="tel"
-                        value={contactNumber}
-                        onChange={(e) => setContactNumber(e.target.value)}
-                        placeholder="+63 XXX XXX XXXX"
-                        required
-                      />
+                {/* Student Information Display */}
+                {(fullName || email || studentId || yearLevel || contactNumber) && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground border-b pb-2">Student Information</h3>
+                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                      {fullName && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Name:</span>
+                          <span className="font-medium">{fullName}</span>
+                        </div>
+                      )}
+                      {email && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Email:</span>
+                          <span className="font-medium">{email}</span>
+                        </div>
+                      )}
+                      {studentId && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Student ID:</span>
+                          <span className="font-medium">{studentId}</span>
+                        </div>
+                      )}
+                      {yearLevel && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Year Level:</span>
+                          <span className="font-medium">{yearLevel}</span>
+                        </div>
+                      )}
+                      {contactNumber && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Contact:</span>
+                          <span className="font-medium">{contactNumber}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Appointment Details Section */}
                 <div className="space-y-4">
