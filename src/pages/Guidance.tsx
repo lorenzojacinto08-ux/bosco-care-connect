@@ -14,11 +14,12 @@ export default function Guidance() {
       description: "Schedule new guidance appointments",
       icon: Calendar,
       path: "/guidance/scheduling",
-      color: "guidance"
+      color: "guidance",
+      studentOnly: true
     },
     {
       title: "Guidance History",
-      description: "View past guidance appointments",
+      description: "View and manage student appointments",
       icon: History,
       path: "/guidance/history",
       adminOnly: true,
@@ -55,6 +56,7 @@ export default function Guidance() {
         <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
           {sections.map((section) => {
             if (section.adminOnly && role !== "admin") return null;
+            if (section.studentOnly && role === "admin") return null;
             
             const Icon = section.icon;
             return (
