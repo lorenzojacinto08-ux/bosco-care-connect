@@ -51,8 +51,8 @@ export default function GuidanceHistory() {
       return;
     }
 
-    // Fetch profiles for each schedule
-    const schedulesWithProfiles = await Promise.all(
+    // Fetch profiles and student records for each schedule
+    const schedulesWithDetails = await Promise.all(
       schedulesData.map(async (schedule) => {
         const { data: profileData } = await supabase
           .from("profiles")
@@ -60,14 +60,21 @@ export default function GuidanceHistory() {
           .eq("id", schedule.student_id)
           .single();
         
+        const { data: studentData } = await supabase
+          .from("student_records")
+          .select("student_id, full_name")
+          .eq("email_address", profileData?.email)
+          .maybeSingle();
+        
         return {
           ...schedule,
-          profiles: profileData
+          profiles: profileData,
+          student_record: studentData
         };
       })
     );
 
-    setSchedules(schedulesWithProfiles);
+    setSchedules(schedulesWithDetails);
     setLoading(false);
   };
 
@@ -215,7 +222,8 @@ export default function GuidanceHistory() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Student</TableHead>
+                    <TableHead>Student ID</TableHead>
+                    <TableHead>Student Name</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Reason</TableHead>
                     <TableHead>Status</TableHead>
@@ -225,9 +233,14 @@ export default function GuidanceHistory() {
                 <TableBody>
                   {schedules.map((schedule) => (
                     <TableRow key={schedule.id}>
+                      <TableCell className="font-medium">
+                        {schedule.student_record?.student_id || "N/A"}
+                      </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{schedule.profiles?.full_name}</div>
+                          <div className="font-medium">
+                            {schedule.student_record?.full_name || schedule.profiles?.full_name}
+                          </div>
                           <div className="text-sm text-muted-foreground">{schedule.profiles?.email}</div>
                         </div>
                       </TableCell>
