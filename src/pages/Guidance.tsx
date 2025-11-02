@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, History, ArrowLeft, Shield } from "lucide-react";
+import { Calendar, History, Archive, ArrowLeft, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Guidance() {
@@ -24,6 +24,14 @@ export default function Guidance() {
       path: "/guidance/history",
       adminOnly: true,
       color: "pastoral"
+    },
+    {
+      title: "History Archive",
+      description: "View completed appointments",
+      icon: Archive,
+      path: "/guidance/history-archive",
+      adminOnly: true,
+      color: "guidance"
     }
   ];
 

@@ -38,14 +38,36 @@ export default function GuidanceHistory() {
 
   const fetchSchedules = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    
+    // Fetch schedules
+    const { data: schedulesData, error: schedulesError } = await supabase
       .from("guidance_schedules")
-      .select("*, profiles(full_name, email)")
+      .select("*")
       .order("scheduled_date", { ascending: false });
 
-    if (!error && data) {
-      setSchedules(data);
+    if (schedulesError || !schedulesData) {
+      console.error("Error fetching schedules:", schedulesError);
+      setLoading(false);
+      return;
     }
+
+    // Fetch profiles for each schedule
+    const schedulesWithProfiles = await Promise.all(
+      schedulesData.map(async (schedule) => {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("full_name, email")
+          .eq("id", schedule.student_id)
+          .single();
+        
+        return {
+          ...schedule,
+          profiles: profileData
+        };
+      })
+    );
+
+    setSchedules(schedulesWithProfiles);
     setLoading(false);
   };
 

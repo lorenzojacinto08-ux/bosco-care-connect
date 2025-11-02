@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Guidance from "./pages/Guidance";
 import GuidanceScheduling from "./pages/GuidanceScheduling";
 import GuidanceHistory from "./pages/GuidanceHistory";
+import GuidanceHistoryArchive from "./pages/GuidanceHistoryArchive";
 import Pastoral from "./pages/Pastoral";
 import PastoralEvents from "./pages/PastoralEvents";
 import SacramentalScriptures from "./pages/SacramentalScriptures";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/guidance" element={<ProtectedRoute><Guidance /></ProtectedRoute>} />
             <Route path="/guidance/scheduling" element={<ProtectedRoute><GuidanceScheduling /></ProtectedRoute>} />
             <Route path="/guidance/history" element={<ProtectedRoute requireAdmin><GuidanceHistory /></ProtectedRoute>} />
+            <Route path="/guidance/history-archive" element={<ProtectedRoute requireAdmin><GuidanceHistoryArchive /></ProtectedRoute>} />
             <Route path="/pastoral" element={<ProtectedRoute><Pastoral /></ProtectedRoute>} />
             <Route path="/pastoral/events" element={<ProtectedRoute><PastoralEvents /></ProtectedRoute>} />
             <Route path="/pastoral/scriptures" element={<ProtectedRoute><SacramentalScriptures /></ProtectedRoute>} />
