@@ -169,8 +169,8 @@ export default function GuidanceHistory() {
               <Shield className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Guidance History</h1>
-              <p className="text-xs text-muted-foreground">Manage Appointments</p>
+              <h1 className="text-xl font-bold text-foreground">Guidance Schedules</h1>
+              <p className="text-xs text-muted-foreground">Manage Student Schedules</p>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate("/guidance")}>
@@ -183,8 +183,8 @@ export default function GuidanceHistory() {
       <main className="container px-4 py-16">
         <Card className="border-t-4" style={{ borderTopColor: "hsl(var(--guidance))" }}>
           <CardHeader>
-            <CardTitle className="text-2xl">Guidance History</CardTitle>
-            <CardDescription>View and manage all guidance appointments</CardDescription>
+            <CardTitle className="text-2xl">Student Schedules</CardTitle>
+            <CardDescription>View and manage all student guidance schedules</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (

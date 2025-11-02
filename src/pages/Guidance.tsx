@@ -18,8 +18,8 @@ export default function Guidance() {
       studentOnly: true
     },
     {
-      title: "Guidance History",
-      description: "View and manage student appointments",
+      title: "Guidance Schedules",
+      description: "View and manage student schedules",
       icon: History,
       path: "/guidance/history",
       adminOnly: true,
