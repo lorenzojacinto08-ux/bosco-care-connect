@@ -34,10 +34,27 @@ export default function GuidanceScheduling() {
   const [reason, setReason] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
 
-  // Fetch student record on mount
+  // Fetch student record and check for existing pending schedules
   useEffect(() => {
     const fetchStudentRecord = async () => {
       if (!user) return;
+      
+      // Check if student already has a pending schedule
+      const { data: existingSchedule } = await supabase
+        .from("guidance_schedules")
+        .select("id")
+        .eq("student_id", user.id)
+        .in("status", ["pending", "confirmed"])
+        .maybeSingle();
+      
+      if (existingSchedule) {
+        toast({
+          title: "Existing Schedule",
+          description: "You already have a pending appointment. Please wait for it to be completed.",
+        });
+        navigate("/");
+        return;
+      }
       
       // First try to get student record by email
       const { data: studentRecord } = await supabase
@@ -70,7 +87,7 @@ export default function GuidanceScheduling() {
     };
     
     fetchStudentRecord();
-  }, [user]);
+  }, [user, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,23 +128,14 @@ ${additionalInfo}
         title: "Error",
         description: "Failed to schedule appointment"
       });
+      setLoading(false);
     } else {
       toast({
         title: "Success",
         description: "Your appointment request has been submitted"
       });
-      // Reset form
-      setStudentId("");
-      setYearLevel("");
-      setContactNumber("");
-      setConcernType("");
-      setScheduledDate(undefined);
-      setScheduledTime("09:00");
-      setReason("");
-      setAdditionalInfo("");
+      navigate("/");
     }
-
-    setLoading(false);
   };
 
   return (

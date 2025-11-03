@@ -39,10 +39,11 @@ export default function GuidanceHistory() {
   const fetchSchedules = async () => {
     setLoading(true);
     
-    // Fetch schedules
+    // Fetch schedules (only pending and confirmed)
     const { data: schedulesData, error: schedulesError } = await supabase
       .from("guidance_schedules")
       .select("*")
+      .in("status", ["pending", "confirmed"])
       .order("scheduled_date", { ascending: false });
 
     if (schedulesError || !schedulesData) {
