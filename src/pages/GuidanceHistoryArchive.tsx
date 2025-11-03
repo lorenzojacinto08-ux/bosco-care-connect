@@ -105,7 +105,6 @@ export default function GuidanceHistoryArchive() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Student ID</TableHead>
                     <TableHead>Student Name</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Reason</TableHead>
@@ -116,9 +115,6 @@ export default function GuidanceHistoryArchive() {
                 <TableBody>
                   {schedules.map((schedule) => (
                     <TableRow key={schedule.id}>
-                      <TableCell className="font-medium">
-                        {schedule.student_record?.student_id || "N/A"}
-                      </TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">

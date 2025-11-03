@@ -31,7 +31,6 @@ export default function GuidanceScheduling() {
   const [concernType, setConcernType] = useState("");
   const [scheduledDate, setScheduledDate] = useState<Date>();
   const [scheduledTime, setScheduledTime] = useState("09:00");
-  const [reason, setReason] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
 
   // Fetch student record and check for existing pending schedules
@@ -117,7 +116,7 @@ ${additionalInfo}
     const { error } = await supabase.from("guidance_schedules").insert({
       student_id: user.id,
       scheduled_date: combinedDateTime.toISOString(),
-      reason: reason,
+      reason: concernType,
       notes: detailedNotes,
       status: "pending"
     });
@@ -272,18 +271,6 @@ ${additionalInfo}
                         />
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="reason">Detailed Reason for Appointment *</Label>
-                    <Textarea
-                      id="reason"
-                      placeholder="Please provide a detailed description of your concern..."
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      rows={4}
-                      required
-                    />
                   </div>
                   
                   <div className="space-y-2">
