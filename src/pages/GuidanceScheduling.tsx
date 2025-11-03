@@ -32,6 +32,7 @@ export default function GuidanceScheduling() {
   const [scheduledDate, setScheduledDate] = useState<Date>();
   const [scheduledTime, setScheduledTime] = useState("09:00");
   const [additionalInfo, setAdditionalInfo] = useState("");
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   // Fetch student record and check for existing pending schedules
   useEffect(() => {
@@ -88,6 +89,37 @@ export default function GuidanceScheduling() {
     fetchStudentRecord();
   }, [user, navigate, toast]);
 
+  // Fetch all booked slots
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      const { data: schedules } = await supabase
+        .from("guidance_schedules")
+        .select("scheduled_date")
+        .in("status", ["pending", "confirmed"]);
+      
+      if (schedules) {
+        const slots = schedules.map(s => s.scheduled_date);
+        setBookedSlots(slots);
+      }
+    };
+    
+    fetchBookedSlots();
+  }, []);
+
+  // Check if selected date and time is booked
+  const isTimeSlotBooked = (date: Date | undefined, time: string): boolean => {
+    if (!date) return false;
+    
+    const [hours, minutes] = time.split(':');
+    const checkDateTime = new Date(date);
+    checkDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    
+    return bookedSlots.some(slot => {
+      const bookedDate = new Date(slot);
+      return bookedDate.getTime() === checkDateTime.getTime();
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !scheduledDate) return;
@@ -98,6 +130,22 @@ export default function GuidanceScheduling() {
     const [hours, minutes] = scheduledTime.split(':');
     const combinedDateTime = new Date(scheduledDate);
     combinedDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+    // Check if the time slot is already booked
+    const isBooked = bookedSlots.some(slot => {
+      const bookedDate = new Date(slot);
+      return bookedDate.getTime() === combinedDateTime.getTime();
+    });
+
+    if (isBooked) {
+      toast({
+        variant: "destructive",
+        title: "Time Slot Unavailable",
+        description: "This date and time is already booked. Please select another slot."
+      });
+      setLoading(false);
+      return;
+    }
 
     // Compile detailed notes
     const detailedNotes = `
@@ -270,6 +318,11 @@ ${additionalInfo}
                           required
                         />
                       </div>
+                      {isTimeSlotBooked(scheduledDate, scheduledTime) && (
+                        <p className="text-sm text-destructive">
+                          This time slot is already booked. Please select a different time.
+                        </p>
+                      )}
                     </div>
                   </div>
                   
