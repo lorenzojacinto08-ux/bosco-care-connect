@@ -107,7 +107,6 @@ export default function GuidanceHistoryArchive() {
                   <TableRow>
                     <TableHead>Student Name</TableHead>
                     <TableHead>Date</TableHead>
-                    <TableHead>Reason</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -126,7 +125,6 @@ export default function GuidanceHistoryArchive() {
                       <TableCell>
                         {format(new Date(schedule.scheduled_date), "PPP p")}
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">{schedule.reason}</TableCell>
                       <TableCell>
                         <Badge variant="default">Completed</Badge>
                       </TableCell>

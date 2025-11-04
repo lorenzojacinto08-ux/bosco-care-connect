@@ -15,6 +15,8 @@ import Pastoral from "./pages/Pastoral";
 import PastoralEvents from "./pages/PastoralEvents";
 import SacramentalScriptures from "./pages/SacramentalScriptures";
 import StudentRecords from "./pages/StudentRecords";
+import StudentApplication from "./pages/StudentApplication";
+import StudentApplications from "./pages/StudentApplications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +39,8 @@ const App = () => (
             <Route path="/pastoral/events" element={<ProtectedRoute><PastoralEvents /></ProtectedRoute>} />
             <Route path="/pastoral/scriptures" element={<ProtectedRoute><SacramentalScriptures /></ProtectedRoute>} />
             <Route path="/student-records" element={<ProtectedRoute requireAdmin><StudentRecords /></ProtectedRoute>} />
+            <Route path="/student-application" element={<ProtectedRoute><StudentApplication /></ProtectedRoute>} />
+            <Route path="/student-applications" element={<ProtectedRoute requireAdmin><StudentApplications /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

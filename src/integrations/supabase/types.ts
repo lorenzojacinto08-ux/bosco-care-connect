@@ -134,6 +134,69 @@ export type Database = {
         }
         Relationships: []
       }
+      student_applications: {
+        Row: {
+          address: string | null
+          created_at: string
+          date_of_birth: string | null
+          education_level: string
+          email_address: string
+          full_name: string
+          gender: string | null
+          grade_year_level: string
+          guardian_contact: string | null
+          guardian_relationship: string | null
+          id: string
+          parent_guardian_name: string | null
+          phone_number: string | null
+          section_program: string | null
+          status: string
+          student_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          education_level: string
+          email_address: string
+          full_name: string
+          gender?: string | null
+          grade_year_level: string
+          guardian_contact?: string | null
+          guardian_relationship?: string | null
+          id?: string
+          parent_guardian_name?: string | null
+          phone_number?: string | null
+          section_program?: string | null
+          status?: string
+          student_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          education_level?: string
+          email_address?: string
+          full_name?: string
+          gender?: string | null
+          grade_year_level?: string
+          guardian_contact?: string | null
+          guardian_relationship?: string | null
+          id?: string
+          parent_guardian_name?: string | null
+          phone_number?: string | null
+          section_program?: string | null
+          status?: string
+          student_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_records: {
         Row: {
           address: string | null

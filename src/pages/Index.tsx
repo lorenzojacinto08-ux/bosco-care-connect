@@ -60,6 +60,15 @@ const Index = () => {
       buttonText: "Access Pastoral"
     },
     {
+      title: "Student Application",
+      description: "Fill your student information form",
+      icon: Users,
+      path: "/student-application",
+      color: "student",
+      buttonText: "Fill Application",
+      studentOnly: true
+    },
+    {
       title: "Student Records",
       description: "View student information",
       icon: Users,
@@ -99,6 +108,7 @@ const Index = () => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
           {cards.map((card) => {
             if (card.adminOnly && role !== "admin") return null;
+            if (card.studentOnly && role === "admin") return null;
             
             const Icon = card.icon;
             return (

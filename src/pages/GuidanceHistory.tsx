@@ -225,7 +225,6 @@ export default function GuidanceHistory() {
                   <TableRow>
                     <TableHead>Student Name</TableHead>
                     <TableHead>Date</TableHead>
-                    <TableHead>Reason</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -244,7 +243,6 @@ export default function GuidanceHistory() {
                       <TableCell>
                         {new Date(schedule.scheduled_date).toLocaleString()}
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">{schedule.reason}</TableCell>
                       <TableCell>
                         <Badge
                           variant={

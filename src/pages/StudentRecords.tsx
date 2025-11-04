@@ -239,6 +239,9 @@ export default function StudentRecords() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate("/student-applications")}>
+              View Applications
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home

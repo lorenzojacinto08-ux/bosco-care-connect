@@ -39,15 +39,25 @@ export default function GuidanceScheduling() {
     const fetchStudentRecord = async () => {
       if (!user) return;
       
-      // Check if student already has a pending schedule
-      const { data: existingSchedule } = await supabase
+      // Check if student already has a pending schedule by user_id OR email
+      const { data: existingSchedules } = await supabase
         .from("guidance_schedules")
-        .select("id")
-        .eq("student_id", user.id)
-        .in("status", ["pending", "confirmed"])
-        .maybeSingle();
+        .select("id, student_id")
+        .in("status", ["pending", "confirmed"]);
       
-      if (existingSchedule) {
+      // Get all profiles to check email matches
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .eq("email", user.email);
+      
+      // Check if any schedule exists for this user's email
+      const userIds = profiles?.map(p => p.id) || [];
+      const hasExistingSchedule = existingSchedules?.some(
+        schedule => schedule.student_id === user.id || userIds.includes(schedule.student_id)
+      );
+      
+      if (hasExistingSchedule) {
         toast({
           title: "Existing Schedule",
           description: "You already have a pending appointment. Please wait for it to be completed.",
