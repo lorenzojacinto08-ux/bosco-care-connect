@@ -155,7 +155,7 @@ export default function PastoralEvents() {
                 if (!isOpen) resetForm();
               }}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button className="bg-pastoral hover:bg-pastoral/90 text-white">
                     <Plus className="mr-2 h-4 w-4" />
                     Add Event
                   </Button>
@@ -169,7 +169,7 @@ export default function PastoralEvents() {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
+                     <Label htmlFor="title">Title *</Label>
                     <Input
                       id="title"
                       value={title}
@@ -194,7 +194,7 @@ export default function PastoralEvents() {
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full justify-start text-left font-normal",
+                              "w-full justify-start text-left font-normal bg-background",
                               !eventDate && "text-muted-foreground"
                             )}
                           >
@@ -202,7 +202,7 @@ export default function PastoralEvents() {
                             {eventDate ? format(eventDate, "PPP") : "Pick a date"}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
                           <Calendar
                             mode="single"
                             selected={eventDate}
@@ -236,7 +236,7 @@ export default function PastoralEvents() {
                       onChange={(e) => setLocation(e.target.value)}
                     />
                   </div>
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full bg-pastoral hover:bg-pastoral/90 text-white">
                     {editingEvent ? "Update" : "Create"} Event
                   </Button>
                 </form>

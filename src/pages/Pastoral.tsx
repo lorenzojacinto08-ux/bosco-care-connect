@@ -44,11 +44,6 @@ export default function Pastoral() {
       </header>
 
       <main className="container px-4 py-16">
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl font-bold mb-3">Pastoral Services</h2>
-          <p className="text-muted-foreground">Events and spiritual resources</p>
-        </div>
-
         <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
           {sections.map((section) => {
             const Icon = section.icon;

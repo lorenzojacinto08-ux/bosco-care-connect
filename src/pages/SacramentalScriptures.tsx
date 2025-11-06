@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Shield } from "lucide-react";
+import { ArrowLeft, Plus, Shield, Eye } from "lucide-react";
 
 export default function SacramentalScriptures() {
   const navigate = useNavigate();
@@ -18,7 +19,9 @@ export default function SacramentalScriptures() {
   const [scriptures, setScriptures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editingScripture, setEditingScripture] = useState<any>(null);
+  const [selectedScripture, setSelectedScripture] = useState<any>(null);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -113,6 +116,11 @@ export default function SacramentalScriptures() {
     setSacramentType("");
   };
 
+  const openViewDialog = (scripture: any) => {
+    setSelectedScripture(scripture);
+    setViewDialogOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="border-b bg-background">
@@ -137,7 +145,7 @@ export default function SacramentalScriptures() {
                 if (!isOpen) resetForm();
               }}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button className="bg-pastoral hover:bg-pastoral/90 text-white">
                     <Plus className="mr-2 h-4 w-4" />
                     Add Scripture
                   </Button>
@@ -178,7 +186,7 @@ export default function SacramentalScriptures() {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full bg-pastoral hover:bg-pastoral/90 text-white">
                     {editingScripture ? "Update" : "Create"} Scripture
                   </Button>
                 </form>
@@ -190,48 +198,85 @@ export default function SacramentalScriptures() {
       </header>
 
       <main className="container px-4 py-16">
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl font-bold mb-3">Sacramental Scriptures</h2>
-          <p className="text-muted-foreground">Spiritual texts and readings</p>
-        </div>
+        <Card className="border-t-4" style={{ borderTopColor: "hsl(var(--pastoral))" }}>
+          <CardHeader>
+            <CardTitle className="text-2xl">Sacramental Scriptures</CardTitle>
+            <CardDescription>Spiritual texts and readings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-8">Loading...</div>
+            ) : scriptures.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">No scriptures found</div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Sacrament Type</TableHead>
+                    <TableHead>Content Preview</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {scriptures.map((scripture) => (
+                    <TableRow key={scripture.id}>
+                      <TableCell className="font-medium">{scripture.title}</TableCell>
+                      <TableCell>{scripture.sacrament_type || "N/A"}</TableCell>
+                      <TableCell className="max-w-md">
+                        <p className="truncate">{scripture.content}</p>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openViewDialog(scripture)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          {role === "admin" && (
+                            <>
+                              <Button size="sm" variant="outline" onClick={() => startEdit(scripture)}>
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => deleteScripture(scripture.id)}
+                              >
+                                Delete
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
 
-        {loading ? (
-          <div className="text-center py-8">Loading...</div>
-        ) : scriptures.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">No scriptures found</div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {scriptures.map((scripture) => (
-              <Card key={scripture.id} className="border-t-4" style={{ borderTopColor: "hsl(var(--pastoral))" }}>
-                <CardHeader>
-                  <CardTitle className="text-xl">{scripture.title}</CardTitle>
-                  {scripture.sacrament_type && (
-                    <CardDescription>{scripture.sacrament_type}</CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-4">
-                    {scripture.content}
-                  </p>
-                  {role === "admin" && (
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => startEdit(scripture)}>
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => deleteScripture(scripture.id)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+        {/* View Dialog */}
+        <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{selectedScripture?.title}</DialogTitle>
+              {selectedScripture?.sacrament_type && (
+                <DialogDescription>{selectedScripture.sacrament_type}</DialogDescription>
+              )}
+            </DialogHeader>
+            {selectedScripture && (
+              <div className="space-y-4">
+                <div className="prose prose-sm max-w-none">
+                  <p className="whitespace-pre-wrap">{selectedScripture.content}</p>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
