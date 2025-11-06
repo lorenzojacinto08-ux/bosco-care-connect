@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Users, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 export default function StudentApplications() {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ export default function StudentApplications() {
   const [loading, setLoading] = useState(true);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<any>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     fetchApplications();
@@ -60,10 +63,11 @@ export default function StudentApplications() {
       });
 
     if (insertError) {
+      console.error("Insert error:", insertError);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create student record"
+        description: insertError.message || "Failed to create student record"
       });
       return;
     }
@@ -91,29 +95,44 @@ export default function StudentApplications() {
   };
 
   const rejectApplication = async (id: string) => {
-    const { error } = await supabase
-      .from("student_applications")
-      .update({ status: "rejected" })
-      .eq("id", id);
-
-    if (error) {
+    if (!rejectionReason.trim()) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to reject application"
+        description: "Please provide a reason for rejection"
+      });
+      return;
+    }
+
+    const { error } = await supabase
+      .from("student_applications")
+      .update({ 
+        status: "rejected",
+        rejection_reason: rejectionReason
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Rejection error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to reject application"
       });
     } else {
       toast({
         title: "Success",
-        description: "Application rejected"
+        description: "Application rejected with reason"
       });
       setViewDialogOpen(false);
+      setRejectionReason("");
       fetchApplications();
     }
   };
 
   const openViewDialog = (application: any) => {
     setSelectedApplication(application);
+    setRejectionReason("");
     setViewDialogOpen(true);
   };
 
@@ -285,22 +304,41 @@ export default function StudentApplications() {
                 </div>
 
                 {selectedApplication.status === "pending" && (
-                  <div className="flex gap-3 justify-end pt-4 border-t">
-                    <Button
-                      variant="outline"
-                      onClick={() => rejectApplication(selectedApplication.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <XCircle className="mr-2 h-4 w-4" />
-                      Reject
-                    </Button>
-                    <Button
-                      onClick={() => approveApplication(selectedApplication)}
-                      className="bg-student hover:bg-student/90 text-white"
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Approve & Create Record
-                    </Button>
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="space-y-2">
+                      <Label htmlFor="rejection-reason">Rejection Reason (if rejecting)</Label>
+                      <Textarea
+                        id="rejection-reason"
+                        placeholder="Provide a reason if you're rejecting this application..."
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex gap-3 justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => rejectApplication(selectedApplication.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <XCircle className="mr-2 h-4 w-4" />
+                        Reject
+                      </Button>
+                      <Button
+                        onClick={() => approveApplication(selectedApplication)}
+                        className="bg-student hover:bg-student/90 text-white"
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Approve & Create Record
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {selectedApplication.status === "rejected" && selectedApplication.rejection_reason && (
+                  <div className="space-y-2 p-4 border rounded-lg bg-destructive/10">
+                    <p className="text-sm font-semibold text-destructive">Rejection Reason:</p>
+                    <p className="text-sm">{selectedApplication.rejection_reason}</p>
                   </div>
                 )}
               </div>

@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Users, CheckCircle } from "lucide-react";
+import { ArrowLeft, Users, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function StudentApplication() {
   const navigate = useNavigate();
@@ -83,7 +84,8 @@ export default function StudentApplication() {
       parent_guardian_name: parentGuardianName || null,
       guardian_contact: guardianContact || null,
       guardian_relationship: guardianRelationship || null,
-      status: "pending"
+      status: "pending",
+      rejection_reason: null
     };
 
     const { error } = await supabase
@@ -91,6 +93,7 @@ export default function StudentApplication() {
       .insert(applicationData);
 
     if (error) {
+      console.error("Application error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -103,6 +106,45 @@ export default function StudentApplication() {
         description: "Your application has been submitted for review"
       });
       navigate("/");
+    }
+  };
+
+  const handleResubmit = async () => {
+    if (!user || !existingApplication) return;
+    
+    setLoading(true);
+    
+    // Update existing application to pending and clear rejection reason
+    const { error } = await supabase
+      .from("student_applications")
+      .update({ 
+        status: "pending",
+        rejection_reason: null
+      })
+      .eq("id", existingApplication.id);
+    
+    if (error) {
+      console.error("Resubmit error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to resubmit application"
+      });
+      setLoading(false);
+    } else {
+      toast({
+        title: "Success",
+        description: "Your application has been resubmitted for review"
+      });
+      // Refresh the application status
+      const { data } = await supabase
+        .from("student_applications")
+        .select("*")
+        .eq("id", existingApplication.id)
+        .maybeSingle();
+      
+      setExistingApplication(data);
+      setLoading(false);
     }
   };
 
@@ -128,13 +170,23 @@ export default function StudentApplication() {
         </header>
 
         <main className="container px-4 py-16 max-w-2xl mx-auto">
-          <Card className="border-t-4" style={{ borderTopColor: "hsl(var(--student))" }}>
+          <Card className="border-t-4" style={{ borderTopColor: existingApplication.status === "rejected" ? "hsl(var(--destructive))" : "hsl(var(--student))" }}>
             <CardHeader>
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-8 w-8 text-student" />
+                {existingApplication.status === "rejected" ? (
+                  <AlertCircle className="h-8 w-8 text-destructive" />
+                ) : (
+                  <CheckCircle className="h-8 w-8 text-student" />
+                )}
                 <div>
-                  <CardTitle className="text-2xl">Application Submitted</CardTitle>
-                  <CardDescription>Your application is under review</CardDescription>
+                  <CardTitle className="text-2xl">
+                    {existingApplication.status === "rejected" ? "Application Rejected" : "Application Submitted"}
+                  </CardTitle>
+                  <CardDescription>
+                    {existingApplication.status === "rejected" 
+                      ? "Your application was not approved" 
+                      : "Your application is under review"}
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -146,10 +198,35 @@ export default function StudentApplication() {
                     <span className="font-semibold text-lg capitalize">{existingApplication.status}</span>
                   </div>
                 </div>
+
+                {existingApplication.status === "rejected" && existingApplication.rejection_reason && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Rejection Reason</AlertTitle>
+                    <AlertDescription>
+                      {existingApplication.rejection_reason}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <p className="text-sm text-muted-foreground">
-                  Your application was submitted on {new Date(existingApplication.created_at).toLocaleDateString()}. 
-                  The admin will review your application and update your student record upon approval.
+                  Your application was submitted on {new Date(existingApplication.created_at).toLocaleDateString()}.
+                  {existingApplication.status === "pending" && " The admin will review your application and update your student record upon approval."}
+                  {existingApplication.status === "approved" && " Your application has been approved and a student record has been created."}
+                  {existingApplication.status === "rejected" && " Please review the rejection reason above and resubmit if you'd like to apply again."}
                 </p>
+
+                {existingApplication.status === "rejected" && (
+                  <Button 
+                    onClick={handleResubmit}
+                    disabled={loading}
+                    className="w-full bg-student hover:bg-student/90 text-white"
+                    size="lg"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    {loading ? "Resubmitting..." : "Resubmit Application"}
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

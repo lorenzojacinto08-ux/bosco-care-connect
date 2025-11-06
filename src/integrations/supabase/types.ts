@@ -149,6 +149,7 @@ export type Database = {
           id: string
           parent_guardian_name: string | null
           phone_number: string | null
+          rejection_reason: string | null
           section_program: string | null
           status: string
           student_id: string
@@ -169,6 +170,7 @@ export type Database = {
           id?: string
           parent_guardian_name?: string | null
           phone_number?: string | null
+          rejection_reason?: string | null
           section_program?: string | null
           status?: string
           student_id: string
@@ -189,6 +191,7 @@ export type Database = {
           id?: string
           parent_guardian_name?: string | null
           phone_number?: string | null
+          rejection_reason?: string | null
           section_program?: string | null
           status?: string
           student_id?: string
