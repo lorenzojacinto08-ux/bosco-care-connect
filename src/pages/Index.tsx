@@ -3,6 +3,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shield, Users2, Users, LogOut } from "lucide-react";
+import boscocareLogo from "@/assets/boscocare-logo.png";
+import heroBackground from "@/assets/hero-background.jpg";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,13 +82,15 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-background">
+    <div className="min-h-screen bg-muted/30 relative">
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-5 pointer-events-none"
+        style={{ backgroundImage: `url(${heroBackground})` }}
+      />
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-10">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-guidance to-pastoral flex items-center justify-center">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
+            <img src={boscocareLogo} alt="Boscocare Logo" className="w-10 h-10 object-contain" />
             <div>
               <h1 className="text-xl font-bold text-foreground">Boscocare</h1>
               <p className="text-xs text-muted-foreground">Pastoral & Guidance System</p>
@@ -99,7 +103,7 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="container px-4 py-16">
+      <main className="container px-4 py-16 relative z-10">
         <div className="mb-12 text-center">
           <h2 className="text-4xl font-bold mb-3">Welcome to Boscocare</h2>
           <p className="text-muted-foreground">Select your section to continue</p>
