@@ -24,6 +24,7 @@ export default function GuidanceHistory() {
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
   
   // Edit form state
@@ -31,6 +32,7 @@ export default function GuidanceHistory() {
   const [editTime, setEditTime] = useState("09:00");
   const [editReason, setEditReason] = useState("");
   const [editNotes, setEditNotes] = useState("");
+  const [remarks, setRemarks] = useState("");
 
   useEffect(() => {
     fetchSchedules();
@@ -121,11 +123,31 @@ export default function GuidanceHistory() {
     }
   };
 
-  const markAsDone = async (id: string) => {
+  const openCompleteDialog = (schedule: any) => {
+    setSelectedSchedule(schedule);
+    setRemarks("");
+    setCompleteDialogOpen(true);
+  };
+
+  const markAsDone = async () => {
+    if (!selectedSchedule) return;
+
+    if (!remarks.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please provide remarks about the counseling session"
+      });
+      return;
+    }
+
     const { error } = await supabase
       .from("guidance_schedules")
-      .update({ status: "completed" })
-      .eq("id", id);
+      .update({ 
+        status: "completed",
+        remarks: remarks
+      })
+      .eq("id", selectedSchedule.id);
 
     if (error) {
       toast({
@@ -138,6 +160,7 @@ export default function GuidanceHistory() {
         title: "Success",
         description: "Appointment marked as completed"
       });
+      setCompleteDialogOpen(false);
       fetchSchedules();
     }
   };
@@ -278,7 +301,7 @@ export default function GuidanceHistory() {
                             <Button
                               variant="default"
                               size="sm"
-                              onClick={() => markAsDone(schedule.id)}
+                              onClick={() => openCompleteDialog(schedule)}
                               className="bg-guidance hover:bg-guidance/90"
                             >
                               <CheckCircle className="h-4 w-4" />
@@ -349,6 +372,39 @@ export default function GuidanceHistory() {
                 )}
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Complete Dialog */}
+        <Dialog open={completeDialogOpen} onOpenChange={setCompleteDialogOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Complete Appointment</DialogTitle>
+              <DialogDescription>Add remarks about how the guidance counseling session went</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="remarks">Session Remarks *</Label>
+                <Textarea
+                  id="remarks"
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  rows={6}
+                  placeholder="Describe what was discussed, outcomes, recommendations, follow-up actions, etc..."
+                  required
+                />
+              </div>
+
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setCompleteDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={markAsDone} className="bg-guidance hover:bg-guidance/90">
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Mark as Completed
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
 

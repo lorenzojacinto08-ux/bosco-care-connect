@@ -7,9 +7,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Users, Eye, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Users, Eye, CheckCircle, XCircle, Search } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function StudentApplications() {
   const navigate = useNavigate();
@@ -19,6 +21,8 @@ export default function StudentApplications() {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<any>(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [gradeFilter, setGradeFilter] = useState("all");
 
   useEffect(() => {
     fetchApplications();
@@ -30,6 +34,7 @@ export default function StudentApplications() {
     const { data, error } = await supabase
       .from("student_applications")
       .select("*")
+      .neq("status", "approved")
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -40,6 +45,19 @@ export default function StudentApplications() {
     
     setLoading(false);
   };
+
+  const filteredApplications = applications.filter((app) => {
+    const matchesSearch = 
+      app.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.student_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.email_address.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesGrade = gradeFilter === "all" || app.grade_year_level === gradeFilter;
+    
+    return matchesSearch && matchesGrade;
+  });
+
+  const uniqueGrades = [...new Set(applications.map(app => app.grade_year_level))].sort();
 
   const approveApplication = async (application: any) => {
     // Insert into student_records
@@ -161,12 +179,38 @@ export default function StudentApplications() {
           <CardHeader>
             <CardTitle className="text-2xl">Pending Applications</CardTitle>
             <CardDescription>Review and approve student applications</CardDescription>
+            <div className="flex gap-4 mt-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, student ID, or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={gradeFilter} onValueChange={setGradeFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Filter by grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Grades</SelectItem>
+                  {uniqueGrades.map((grade) => (
+                    <SelectItem key={grade} value={grade}>
+                      {grade}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             {loading ? (
               <div className="text-center py-8">Loading...</div>
-            ) : applications.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No applications found</div>
+            ) : filteredApplications.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {applications.length === 0 ? "No applications found" : "No applications match your filters"}
+              </div>
             ) : (
               <Table>
                 <TableHeader>
@@ -181,7 +225,7 @@ export default function StudentApplications() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {applications.map((application) => (
+                  {filteredApplications.map((application) => (
                     <TableRow key={application.id}>
                       <TableCell className="font-medium">{application.full_name}</TableCell>
                       <TableCell>{application.student_id}</TableCell>

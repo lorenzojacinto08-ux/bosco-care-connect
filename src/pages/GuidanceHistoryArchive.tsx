@@ -180,6 +180,12 @@ export default function GuidanceHistoryArchive() {
                     <p className="font-medium whitespace-pre-wrap">{selectedSchedule.notes}</p>
                   </div>
                 )}
+                {selectedSchedule.remarks && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Session Remarks</p>
+                    <p className="font-medium whitespace-pre-wrap">{selectedSchedule.remarks}</p>
+                  </div>
+                )}
               </div>
             )}
           </DialogContent>
