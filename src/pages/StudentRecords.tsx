@@ -31,6 +31,7 @@ export default function StudentRecords() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Form state
   const [studentId, setStudentId] = useState("");
@@ -176,7 +177,14 @@ export default function StudentRecords() {
   };
 
   const filterStudentsByLevel = (level: string) => {
-    return students.filter(s => s.education_level === level);
+    return students.filter(s => {
+      const matchesLevel = s.education_level === level;
+      const matchesSearch = 
+        s.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.student_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (s.email_address && s.email_address.toLowerCase().includes(searchTerm.toLowerCase()));
+      return matchesLevel && matchesSearch;
+    });
   };
 
   const StudentTable = ({ data }: { data: any[] }) => (
@@ -464,6 +472,13 @@ export default function StudentRecords() {
             <CardDescription>Manage student information by education level</CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-6">
+              <Input
+                placeholder="Search by name, student ID, or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
             {loading ? (
               <div className="text-center py-8">Loading...</div>
             ) : (
